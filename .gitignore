@@ -1,0 +1,30 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+logs/
+*.log
+
+# Local database files and dumps
+*.sql
+*.dump
+*.sqlite
+*.sqlite3
+
+# Generated data and model artifacts
+data/interim/*
+data/processed/*
+data/rejected/*
+data/reports/*
+artifacts/models/*
+artifacts/plots/*
+artifacts/metrics/*
+
+# Keep directory placeholders if they are added later
+!.gitkeep

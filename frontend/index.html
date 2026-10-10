@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Historical air-quality analytics dashboard">
+    <title>Air Quality Dashboard</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">ENVIRONMENTAL INTELLIGENCE</p>
+          <h1>Air Quality Dashboard</h1>
+          <p class="subtitle">Historical observations and model-ready insights</p>
+        </div>
+        <div class="header-actions">
+          <label class="select-wrap" for="city-filter">
+            <span class="sr-only">Filter by city</span>
+            <select id="city-filter">
+              <option value="">All cities</option>
+              <option>Delhi</option>
+              <option>Mumbai</option>
+              <option>Chennai</option>
+              <option>Kolkata</option>
+              <option>Bangalore</option>
+            </select>
+          </label>
+          <span id="connection-status" class="status-pill status-loading">Connecting</span>
+        </div>
+      </header>
+
+      <div id="page-message" class="page-message" role="status" hidden></div>
+
+      <section class="dashboard-grid" aria-label="Air quality overview">
+        <article class="card aqi-card">
+          <div class="card-heading">
+            <span>AQI overview</span><span class="card-icon">◉</span>
+          </div>
+          <div id="aqi-value" class="aqi-value">--</div>
+          <p id="aqi-label" class="aqi-label">Waiting for verified data</p>
+          <div class="mini-track"><span id="aqi-progress"></span></div>
+          <div class="muted-row"><span>Latest observation</span><strong id="latest-time">--</strong></div>
+        </article>
+
+        <article class="card forecast-card">
+          <div class="card-heading">
+            <span>AQI forecast</span><span class="card-note">Next 48 hrs</span>
+          </div>
+          <div id="forecast-chart" class="chart-panel" data-empty="No forecast available yet">
+            <svg class="chart-svg" viewBox="0 0 620 220" role="img" aria-label="AQI forecast chart"></svg>
+          </div>
+        </article>
+
+        <article class="card pollutant-card">
+          <div class="card-heading">
+            <span>Pollutant breakdown</span><span class="card-icon">≋</span>
+          </div>
+          <div id="pollutant-list" class="pollutant-list"></div>
+        </article>
+
+        <article class="card trends-card">
+          <div class="card-heading"><span>Historical trends</span><span class="card-note">Database summary</span></div>
+          <div id="trend-chart" class="chart-panel compact" data-empty="No trend data available">
+            <svg class="chart-svg" viewBox="0 0 620 180" role="img" aria-label="Historical AQI trend chart"></svg>
+          </div>
+        </article>
+
+        <article class="card anomaly-card">
+          <div class="card-heading"><span>Potential anomalies</span><span class="card-icon warning">!</span></div>
+          <div id="anomaly-content" class="empty-state">
+            <strong>No anomaly results yet</strong>
+            <span>Anomaly detection will appear after its analysis phase.</span>
+          </div>
+        </article>
+
+        <article class="card advisory-card">
+          <div class="card-heading"><span>Health advisory</span><span class="card-icon shield">◇</span></div>
+          <div class="advisory-content">
+            <div class="advisory-mark">+</div>
+            <div>
+              <strong>Evidence-based guidance</strong>
+              <p>Advisories will be shown when supported by verified observations.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card reports-card">
+          <div class="card-heading"><span>Reports</span><span class="card-icon">▤</span></div>
+          <div class="report-links">
+            <a href="../data/reports/eda_report.md">EDA report <span>↗</span></a>
+            <a href="../data/reports/profile_report.md">Data profile <span>↗</span></a>
+            <a href="../data/reports/database_import_report.md">Import report <span>↗</span></a>
+          </div>
+        </article>
+      </section>
+
+      <footer class="footer">
+        <span>Historical-data-based dashboard · Not a live alert service</span>
+        <span id="data-range">Data range: --</span>
+      </footer>
+    </main>
+    <script type="module" src="assets/js/dashboard.js"></script>
+  </body>
+</html>

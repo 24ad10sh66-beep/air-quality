@@ -1,0 +1,14 @@
+app:
+  name: air-quality-intelligence
+  environment: development
+  timezone: UTC
+
+data:
+  raw_directory: data/raw
+  interim_directory: data/interim
+  processed_directory: data/processed
+  rejected_directory: data/rejected
+  reports_directory: data/reports
+
+logging:
+  level: INFO
