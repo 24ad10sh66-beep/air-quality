@@ -54,16 +54,14 @@
   checksum.
 - Validation script passed with 382,343 rows and 18 standardized columns.
 
-## Later phases
-
 ## Phase 4 - MySQL setup and database design
 
-- **Status:** Tooling ready; blocked on local database credentials and inventory
+- **Status:** Complete in the local environment
 - MySQL80 is running and `127.0.0.1:3306` is reachable.
 - Proposed database: `air_quality_db`
 - Proposed schema: `database/schema/001_initial_schema.sql`
 - Design documentation: `docs/database_design.md`
-- No database/table creation or destructive SQL was executed.
+- Database/table creation used only idempotent `IF NOT EXISTS` statements.
 - Added safe connection helpers and scripts:
   `src/air_quality/db/connection.py`, `scripts/check_database.py`,
   `scripts/create_database.py`, and `scripts/init_database.py`.
@@ -79,7 +77,7 @@
 
 ## Phase 6 - Exploratory data analysis
 
-- **Status:** Complete; model training intentionally not started
+- **Status:** Complete
 - Added read-only database analysis in `src/air_quality/analytics/eda.py` and
   `scripts/run_eda.py`.
 - Reports: `data/reports/eda_report.json` and
@@ -88,12 +86,21 @@
   observed range 2015-01-01 through 2024-12-31.
 - The EDA includes city counts/AQI summaries, AQI bucket distribution, null
   counts, yearly AQI summaries, and pollutant min/mean/max statistics.
-- No model target, feature dataset, train/test split, or model artifact was
-  created.
+
+## Phase 7 - Forecasting and anomaly detection
+
+- **Status:** Complete
+- Added leakage-safe autoregressive features and chronological train/test
+  evaluation in `src/air_quality/models/time_series.py`.
+- Added `scripts/train_models.py` to regenerate model binaries and JSON
+  artifacts under `artifacts/models/`.
+- Trained 13 configured targets with a 48-hour recursive forecast horizon.
+- Added ExtraTrees metrics, forecasts, and Isolation Forest plus rolling
+  z-score anomaly results to the generated artifacts.
 
 ## Frontend dashboard shell
 
-- **Status:** Complete; waiting for backend API
+- **Status:** Complete and connected to the backend API
 - Added a responsive dashboard inspired by the supplied screenshot:
   `frontend/index.html`, `frontend/assets/css/styles.css`,
   `frontend/assets/js/api.js`, `frontend/assets/js/charts.js`, and
@@ -101,25 +108,29 @@
 - The UI includes AQI overview, forecast chart, pollutant breakdown,
   historical trends, potential anomalies, health advisory, city filter, and
   report links.
-- It intentionally shows empty/loading states instead of fabricated values.
-- Model training was not performed and no model files were created.
+- It shows explicit empty states only when optional model artifacts are absent.
+- Forecast values, anomaly results, city filtering, and AQI guidance are
+  populated from API responses.
 
 ## Backend API
 
-- **Status:** Complete; forecast/anomaly results intentionally empty
+- **Status:** Complete
 - Added FastAPI app and response schemas in
   `src/air_quality/api/main.py` and `src/air_quality/api/schemas.py`.
 - Added `scripts/run_backend.py` for port 8000 and
   `scripts/run_frontend.py` for port 5500.
-- Implemented and smoke-tested `/health`, `/api/summary`,
+- Implemented `/health`, `/api/summary`,
   `/api/readings`, `/api/analytics`, `/api/forecasts`, and
   `/api/anomalies`.
 - Verified `/health` database connection, 382,343 reading total, five-city
   analytics, and city filtering for Delhi.
-- Frontend server returned HTTP 200 on port 5500 and browser verification
-  confirmed live API data, the city filter, charts, and honest empty forecast
-  and anomaly states.
+- Frontend server returns HTTP 200 on port 5500. The dashboard renders live
+  API data, city filtering, trends, forecasts, anomalies, and health guidance.
 
-Cleaning, validation, MySQL setup/import, analysis, forecasting, API,
-dashboard, testing, and final documentation remain gated behind the earlier
-phases and explicit approval.
+## Validation
+
+- Run unit tests with `.\.venv\Scripts\python.exe -m pytest -q`.
+- Run static checks with `.\.venv\Scripts\python.exe -m ruff check src
+  scripts tests`.
+- Regenerate ignored data/model outputs with the commands in `README.md` when
+  moving to a fresh environment.

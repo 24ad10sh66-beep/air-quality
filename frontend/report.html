@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Location Air Quality Report</title>
+    <style>
+      :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #071321; color: #edf7ff; }
+      body { margin: 0; padding: 32px; } main { margin: auto; max-width: 900px; }
+      .card { background: #0d2238; border: 1px solid #31536b; border-radius: 16px; margin: 16px 0; padding: 20px; }
+      .muted { color: #9ab4c7; } .good { color: #8be34b; } .warn { color: #ffb51b; } .bad { color: #ff5b55; }
+      .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+      .metric { background: #102b45; border-radius: 10px; padding: 14px; } .metric strong { display: block; font-size: 24px; margin-top: 6px; }
+      li { margin: 9px 0; } h1 { margin-bottom: 4px; } h2 { margin-top: 0; }
+    </style>
+  </head>
+  <body><main id="report"><p class="muted">Loading report...</p></main>
+    <script type="module">
+      const params = new URLSearchParams(location.search);
+      const lat = params.get("lat"); const lon = params.get("lon"); const name = params.get("name") || "Selected location";
+      const root = document.querySelector("#report");
+      const categoryClass = (value) => value <= 100 ? "good" : value <= 200 ? "warn" : "bad";
+      const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+      async function load() {
+        if (!lat || !lon) throw new Error("Location coordinates are missing.");
+        const response = await fetch(`http://127.0.0.1:8000/api/location-report?lat=${lat}&lon=${lon}&name=${encodeURIComponent(name)}`);
+        if (!response.ok) throw new Error("Could not load the location report.");
+        const report = await response.json(); const live = report.live;
+        const pollutantRows = Object.entries(live.pollutants).map(([key, value]) => `<li><strong>${escapeHtml(key.toUpperCase())}</strong>: ${value == null ? "--" : Number(value).toFixed(1)}</li>`).join("");
+        const anomalyRows = report.anomalies.length ? report.anomalies.map((item) => `<li>${escapeHtml(item.metric)}: ${Number(item.value).toFixed(1)} — ${escapeHtml(item.reason)}</li>`).join("") : "<li>No current or forecast anomaly detected.</li>";
+        const forecastValues = report.forecast.map((item) => item.prediction).filter(Number.isFinite);
+        const historyRows = (report.history || []).map((item) => `<li>${new Date(item.fetched_at).toLocaleString()} — AQI ${item.aqi == null ? "--" : Math.round(item.aqi)} (${escapeHtml(item.aqi_bucket || "Unavailable")})</li>`).join("") || "<li>No saved history yet.</li>";
+        root.innerHTML = `<h1>${escapeHtml(report.location)}</h1><p class="muted">Live OpenWeather report · Generated ${new Date().toLocaleString()}</p>
+          <section class="card"><h2>Current condition</h2><div class="grid"><div class="metric">AQI<strong class="${categoryClass(live.aqi)}">${Math.round(live.aqi)} · ${escapeHtml(live.aqi_bucket)}</strong></div><div class="metric">Forecast range<strong>${forecastValues.length ? `${Math.round(Math.min(...forecastValues))}-${Math.round(Math.max(...forecastValues))}` : "--"}</strong></div></div></section>
+          <section class="card"><h2>Saved previous readings</h2><ul>${historyRows}</ul></section>
+          <section class="card"><h2>Pollutants</h2><ul>${pollutantRows}</ul></section>
+          <section class="card"><h2>Potential anomalies</h2><ul>${anomalyRows}</ul></section>
+          <section class="card"><h2>What should you do now?</h2><p>${escapeHtml(report.advisory)}</p></section>
+          <section class="card"><h2>Forecast</h2><p class="muted">The next ${report.forecast.length} forecast points are shown in the dashboard. The range above indicates the expected AQI spread.</p></section>`;
+      }
+      load().catch((error) => { root.innerHTML = `<section class="card"><h2>Report unavailable</h2><p>${escapeHtml(error.message)}</p></section>`; });
+    </script>
+  </body>
+</html>

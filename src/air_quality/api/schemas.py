@@ -23,6 +23,32 @@ class SummaryResponse(BaseModel):
     forecast: list[dict[str, Any]]
 
 
+class LiveAqiResponse(BaseModel):
+    aqi: float | None
+    aqi_bucket: str | None
+    city: str | None
+    observed_at: datetime | None
+    pollutants: dict[str, float | None]
+    source: str
+
+
+class LocationSearchResponse(BaseModel):
+    results: list[dict[str, Any]]
+
+
+class LocationReportResponse(BaseModel):
+    location: str
+    latitude: float
+    longitude: float
+    live: LiveAqiResponse
+    forecast: list[dict[str, Any]]
+    advisory: str
+    anomalies: list[dict[str, Any]]
+    history: list[dict[str, Any]]
+    historical_trend: list[dict[str, Any]]
+    historical_city: str | None
+
+
 class ReadingResponse(BaseModel):
     id: int
     city: str

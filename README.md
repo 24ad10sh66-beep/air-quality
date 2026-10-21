@@ -1,13 +1,13 @@
 # Air Quality Intelligence
 
-This project will implement an AI-driven air-quality forecasting, pollution
-analytics, and environmental decision-support framework.
+This project provides an air-quality analytics dashboard, leakage-safe
+forecasting, anomaly detection, and an API backed by verified historical data.
 
 ## Project status
 
-The workspace is currently in **Phase 1: architecture and folder structure**.
-The dataset has not yet been added or profiled. Implementation must proceed
-phase by phase after review and approval.
+The data cleaning, MySQL import, analysis, model training, API, and dashboard
+phases are implemented locally. Generated datasets and model binaries are
+intentionally ignored by Git; they must be produced in each environment.
 
 ## Planned workflow
 
@@ -20,7 +20,7 @@ phase by phase after review and approval.
 7. Add the API, dashboard, tests, and final documentation.
 
 See [docs/implementation_plan.md](docs/implementation_plan.md) for the
-phase gates and current status.
+current implementation status and reproducible commands.
 
 ## Run the local dashboard
 
@@ -40,5 +40,12 @@ Start the static frontend in a second terminal:
 Open `http://127.0.0.1:5500`. The API documentation is at
 `http://127.0.0.1:8000/docs`.
 
-Forecast and anomaly sections intentionally remain empty until their approved
-analysis/model phases are completed.
+To regenerate the forecast and anomaly artifacts after cleaning the dataset:
+
+```powershell
+$env:PYTHONPATH = "src"
+.\.venv\Scripts\python.exe scripts\train_models.py
+```
+
+The API requires the local MySQL settings in `.env`. Forecast and anomaly
+endpoints return the generated artifacts and never fabricate values.

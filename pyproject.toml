@@ -11,14 +11,15 @@ dependencies = []
 
 [project.optional-dependencies]
 data = [
-    "numpy",
-    "pandas",
-    "scipy",
+    "numpy==2.2.6",
+    "pandas==3.0.3",
+    "scipy==1.17.1",
     "matplotlib",
     "plotly",
 ]
 ml = [
-    "scikit-learn",
+    "scikit-learn==1.8.0",
+    "joblib==1.6.0",
 ]
 api = [
     "fastapi==0.103.2",

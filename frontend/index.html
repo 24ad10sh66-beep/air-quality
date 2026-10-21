@@ -8,67 +8,105 @@
     <link rel="stylesheet" href="assets/css/styles.css">
   </head>
   <body>
+    <div class="air-particles" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
     <main class="app-shell">
       <header class="topbar">
         <div>
           <p class="eyebrow">ENVIRONMENTAL INTELLIGENCE</p>
-          <h1>Air Quality Dashboard</h1>
-          <p class="subtitle">Historical observations and model-ready insights</p>
+          <h1>Air Quality</h1>
+
         </div>
         <div class="header-actions">
-          <label class="select-wrap" for="city-filter">
-            <span class="sr-only">Filter by city</span>
-            <select id="city-filter">
-              <option value="">All cities</option>
-              <option>Delhi</option>
-              <option>Mumbai</option>
-              <option>Chennai</option>
-              <option>Kolkata</option>
-              <option>Bangalore</option>
-            </select>
-          </label>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch theme">
+            <span class="theme-icon" aria-hidden="true">☼</span><span class="theme-label">Light mode</span>
+          </button>
+          <button id="refresh-button" class="refresh-button" type="button" title="Refresh dashboard">
+            <span aria-hidden="true">↻</span> Refresh
+          </button>
           <span id="connection-status" class="status-pill status-loading">Connecting</span>
         </div>
+        <form id="location-search" class="location-search">
+          <label class="sr-only" for="location-query">Search any location</label>
+          <input id="location-query" type="search" minlength="2" placeholder="Search location..." autocomplete="off">
+          <button type="submit">Search</button>
+        </form>
       </header>
 
       <div id="page-message" class="page-message" role="status" hidden></div>
 
+      <section class="insight-strip" aria-label="Dashboard highlights">
+        <div class="insight-item"><span class="insight-icon">◉</span><div><small>Current AQI</small><strong id="quick-aqi">--</strong></div></div>
+        <div class="insight-item"><span class="insight-icon cyan">⌁</span><div><small>Forecast horizon</small><strong>48 hours</strong></div></div>
+        <div class="insight-item"><span class="insight-icon amber">!</span><div><small>Potential anomalies</small><strong id="quick-anomalies">--</strong></div></div>
+        <div class="insight-item"><span class="insight-icon green">✓</span><div><small>Data status</small><strong id="quick-status">Checking</strong></div></div>
+      </section>
+
+      <div class="section-heading">
+        <div><span>Live air quality overview</span><small>Search any location to explore live pollutants, forecasts and health guidance.</small></div>
+        <span class="section-rule" aria-hidden="true"></span>
+      </div>
+
       <section class="dashboard-grid" aria-label="Air quality overview">
         <article class="card aqi-card">
           <div class="card-heading">
-            <span>AQI overview</span><span class="card-icon">◉</span>
+            <div><span>AQI overview</span><small class="card-help">Overall air quality index</small></div><span class="card-icon" title="Air Quality Index">◉</span>
           </div>
           <div id="aqi-value" class="aqi-value">--</div>
           <p id="aqi-label" class="aqi-label">Waiting for verified data</p>
           <div class="mini-track"><span id="aqi-progress"></span></div>
+          <div class="aqi-scale" aria-label="AQI scale"><span>Good</span><span>Moderate</span><span>Severe</span></div>
           <div class="muted-row"><span>Latest observation</span><strong id="latest-time">--</strong></div>
+          <div class="live-source" id="live-source">Live source: waiting for location</div>
+          <div class="aqi-comparison" aria-label="Historical and live AQI comparison">
+            <div><small>Previous AQI</small><strong id="previous-aqi">--</strong></div>
+            <div><small>Live AQI</small><strong id="comparison-live-aqi">--</strong></div>
+            <div><small>Change</small><strong id="aqi-change">--</strong></div>
+          </div>
         </article>
 
         <article class="card forecast-card">
           <div class="card-heading">
-            <span>AQI forecast</span><span class="card-note">Next 48 hrs</span>
+            <div><span>AQI forecast</span><small class="card-help">Model prediction from latest reading</small></div><span class="card-note">Next 48 hrs</span>
           </div>
+          <div class="chart-legend"><span class="legend-dot forecast-dot"></span>Predicted AQI <span class="legend-hint">Hover points for details</span></div>
           <div id="forecast-chart" class="chart-panel" data-empty="No forecast available yet">
             <svg class="chart-svg" viewBox="0 0 620 220" role="img" aria-label="AQI forecast chart"></svg>
           </div>
+          <div class="risk-chart-heading"><span>Forecast air-quality zones</span><small>Risk by hour</small></div>
+          <div id="risk-chart" class="risk-chart" aria-label="Forecast air-quality zones"></div>
+          <div id="forecast-detail" class="chart-detail" aria-live="polite">
+            <span class="detail-label">Click any forecast point</span>
+            <strong>Select a point to see the expected air quality.</strong>
+          </div>
+          <div class="forecast-summary" id="forecast-summary">Forecast summary: waiting for model data</div>
         </article>
 
         <article class="card pollutant-card">
           <div class="card-heading">
-            <span>Pollutant breakdown</span><span class="card-icon">≋</span>
+            <div><span>Pollutant breakdown</span><small class="card-help">Latest concentration · hover a row to learn more</small></div><span class="card-icon" title="Common air pollutants">≋</span>
           </div>
+          <div class="pollutant-columns"><span>Pollutant</span><span>Level</span><span>Value</span></div>
           <div id="pollutant-list" class="pollutant-list"></div>
         </article>
 
         <article class="card trends-card">
-          <div class="card-heading"><span>Historical trends</span><span class="card-note">Database summary</span></div>
+          <div class="card-heading"><div><span>Historical trends</span><small class="card-help">Saved AQI readings for the selected location</small></div><span class="card-note">Historical</span></div>
+          <div class="chart-legend"><span class="legend-dot trend-dot"></span>Observed AQI <span class="legend-hint">Hover points for details</span></div>
           <div id="trend-chart" class="chart-panel compact" data-empty="No trend data available">
             <svg class="chart-svg" viewBox="0 0 620 180" role="img" aria-label="Historical AQI trend chart"></svg>
+          </div>
+          <div id="trend-summary" class="trend-summary">Save more readings to see whether AQI is rising or falling.</div>
+          <div id="trend-detail" class="chart-detail compact-detail" aria-live="polite">
+            <span class="detail-label">Click any trend point</span>
+            <strong>Select a date to see the average AQI.</strong>
           </div>
         </article>
 
         <article class="card anomaly-card">
-          <div class="card-heading"><span>Potential anomalies</span><span class="card-icon warning">!</span></div>
+          <div class="card-heading"><div><span>Potential anomalies</span><small class="card-help">Unusual readings flagged by the model</small></div><span class="card-icon warning" title="Potential anomaly">!</span></div>
           <div id="anomaly-content" class="empty-state">
             <strong>No anomaly results yet</strong>
             <span>Anomaly detection will appear after its analysis phase.</span>
@@ -76,28 +114,33 @@
         </article>
 
         <article class="card advisory-card">
-          <div class="card-heading"><span>Health advisory</span><span class="card-icon shield">◇</span></div>
+          <div class="card-heading"><div><span>Health advisory</span><small class="card-help">General guidance based on current AQI</small></div><span class="card-icon shield" title="Health guidance">◇</span></div>
           <div class="advisory-content">
-            <div class="advisory-mark">+</div>
-            <div>
-              <strong>Evidence-based guidance</strong>
-              <p>Advisories will be shown when supported by verified observations.</p>
+            <div id="advisory-mark" class="advisory-mark">+</div>
+            <div class="advisory-copy">
+              <div class="advisory-title-row"><strong id="advisory-title">Loading guidance</strong><span id="advisory-aqi">AQI --</span></div>
+              <p id="advisory-text">Guidance is based on the latest verified AQI observation.</p>
+              <small id="advisory-note">Select a city to see its latest advice.</small>
             </div>
           </div>
         </article>
 
         <article class="card reports-card">
-          <div class="card-heading"><span>Reports</span><span class="card-icon">▤</span></div>
+          <div class="card-heading"><div><span>Reports</span><small class="card-help">Open supporting data reports</small></div><span class="card-icon">▤</span></div>
+          <a id="location-report-link" class="report-summary" href="report.html" target="_blank" rel="noreferrer">
+            <span class="report-status">✓ Live location report · Open detailed report ↗</span>
+            <p id="location-report">Search a location to see live AQI, pollutants, forecast and guidance.</p>
+          </a>
           <div class="report-links">
-            <a href="../data/reports/eda_report.md">EDA report <span>↗</span></a>
-            <a href="../data/reports/profile_report.md">Data profile <span>↗</span></a>
-            <a href="../data/reports/database_import_report.md">Import report <span>↗</span></a>
+          <a id="location-report-open" class="report-action primary" href="report.html" target="_blank" rel="noreferrer">View full report <span>↗</span></a>
+          <a id="location-report-download" class="report-action" href="report.html" download="air-quality-report.html">Download report <span>↓</span></a>
+          <a class="report-action secondary" href="http://127.0.0.1:8000/docs" target="_blank" rel="noreferrer">API documentation <span>↗</span></a>
           </div>
         </article>
       </section>
 
       <footer class="footer">
-        <span>Historical-data-based dashboard · Not a live alert service</span>
+        <span>Historical data plus live air-quality insights · Not an emergency alert service</span>
         <span id="data-range">Data range: --</span>
       </footer>
     </main>
