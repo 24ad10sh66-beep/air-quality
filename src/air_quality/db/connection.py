@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import ssl
 from pathlib import Path
 from urllib.parse import quote_plus
 
@@ -42,7 +43,16 @@ def create_database_engine(include_database: bool = True) -> Engine:
     """Create an engine with bounded connection and pool settings."""
     return create_engine(
         build_database_url(include_database=include_database),
-        connect_args={"connect_timeout": 10},
+        connect_args={
+            "connect_timeout": 10,
+            "ssl": {
+                "ca": str(
+                    Path(__file__).resolve().parents[3]
+                    / "certs"
+                    / "aiven-ca.pem"
+                )
+            },
+        },
         pool_pre_ping=True,
         pool_recycle=1800,
     )
